@@ -49,6 +49,7 @@ public class FirstRestController {
             }
             else{
                 System.out.println("Wrong login info");
+                callAnswer = "Wrong login info";
             }
         }
         private  void authLoginUser(String loginEmail, String loginPassword){
@@ -77,9 +78,11 @@ public class FirstRestController {
             if (counter>=1){
                 setUserHasLoggedIn(true);
                 userInfo = this;
+                callAnswer = "You are logged in!";
                 System.out.println("User found!");
             }
             else{
+                callAnswer = "There is no user with this email and password, please register";
                 System.out.println("No user found!");
             }
         }
@@ -91,6 +94,7 @@ public class FirstRestController {
         private  void authDeleteUser(String registerEmail, String registerPassword){
             DatabaseHandler dbHandler = new DatabaseHandler();
             dbHandler.deleteUser(registerEmail, registerPassword);
+            callAnswer = "Deleted entered user";
         }
         public void checkCreateRoom(String roomName, String location, int capacity){
             if(!roomName.equals("") && capacity<=100 && capacity>0){
@@ -98,23 +102,27 @@ public class FirstRestController {
             }
             else{
                 System.out.println("Wrong room info");
+                callAnswer = "Wrong room info!";
             }
         }
         private  void authCreateRoom(String roomName, String location, int capacity){
             DatabaseHandler dbHandler = new DatabaseHandler();
             dbHandler.createRoom(roomName, location, capacity);
+            callAnswer = "Room is created with these parameters - " + "room name: " + roomName + " room location: " + location + " room capacity: " + capacity;
         }
         public void checkDeleteRoom(String roomName){
             if(!roomName.equals("")){
                 authDeleteRoom(roomName);
             }
             else{
+                callAnswer = "Wrong room info!";
                 System.out.println("Wrong login info");
             }
         }
         private  void authDeleteRoom(String roomName){
             DatabaseHandler dbHandler = new DatabaseHandler();
             dbHandler.deleteRoom(roomName);
+            callAnswer = "Deleted room with this name: " + roomName;
         }
 
         private  void checkRoomAvailability(String startStringDate, String endStringDate){
@@ -143,10 +151,12 @@ public class FirstRestController {
 
                 System.out.println(counter);
                 if (counter>=1){
+                    callAnswer = "Room is already rented for that time!";
                     System.out.println("time found!");
                 }
                 else{
                     dbHandler.rentTime(startDate,endDate);
+                    callAnswer = "You have rented a room from " + startDate + " to " + endDate;
                     System.out.println("clear to write!");
                 }
 
@@ -181,15 +191,6 @@ public class FirstRestController {
                     callAnswer += "Start date: " + result.getString("startDate") + " End date:" + result.getString("finalDate") + " ,";
                 }
 
-                System.out.println(counter);
-                if (counter>=1){
-
-                    System.out.println("time found!");
-                }
-                else{
-                    System.out.println("clear to write!");
-                }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -197,6 +198,7 @@ public class FirstRestController {
         }
 
     }
+    //Turns integers into simple date format
     public static class Date{
 
         public static String setDate(int startDay, int startHours, int startMinutes) {
@@ -250,9 +252,9 @@ public class FirstRestController {
         }
 
 
-        //if(result.userHasLoggedIn){
+        if(result.userHasLoggedIn){
             result.checkRoomHours(Date.setDate(startDay, startHours, startMinutes), Date.setDate(finalDay, finalHours,finalMinutes));
-        //}
+        }
         return result;
     }
     @RequestMapping(path = "/deleteUser/{email}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
