@@ -193,9 +193,9 @@ public class FirstRestController {
         }
 
 
-        //if(result.userHasLoggedIn){
+        if(result.userHasLoggedIn){
             result.checkRoomAvailability(Date.setDate(startDay, startHours, startMinutes), Date.setDate(finalDay, finalHours,finalMinutes));
-        //}
+        }
         return result;
     }
     @RequestMapping(path = "/deleteUser/{email}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
