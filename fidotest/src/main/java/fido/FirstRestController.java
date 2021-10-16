@@ -17,7 +17,7 @@ public class FirstRestController {
 
     public static class RestResponse{
         private boolean userHasLoggedIn = false;
-        private String callAnswer = "";
+        public String callAnswer = "";
         public boolean getUserHasLoggedIn() {
             return userHasLoggedIn;
         }
@@ -155,6 +155,46 @@ public class FirstRestController {
             }
 
         }
+        private  void checkRoomHours(String startStringDate, String endStringDate){
+            DatabaseHandler dbHandler = new DatabaseHandler();
+            ResultSet result = null;
+            int counter = 0;
+            try {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new SimpleDateFormat("dd HH:mm").parse(startStringDate));
+                Timestamp startDate = new Timestamp(cal.getTimeInMillis());
+                System.out.println(startDate);
+                Calendar cal2 = Calendar.getInstance();
+                cal2.setTime(new SimpleDateFormat("dd HH:mm").parse(endStringDate));
+
+                Timestamp endDate = new Timestamp(cal2.getTimeInMillis());
+                System.out.println(endDate);
+                if(endDate.before(startDate)) {
+                    result = dbHandler.checkRoomAvailability(endDate, startDate);
+                }
+                else{
+                    result = dbHandler.checkRoomAvailability(startDate, endDate);
+                }
+                callAnswer = "Rented hours ";
+                while(result.next()){
+                    counter++;
+                    callAnswer += "Start date: " + result.getString("startDate") + " End date:" + result.getString("finalDate") + " ,";
+                }
+
+                System.out.println(counter);
+                if (counter>=1){
+
+                    System.out.println("time found!");
+                }
+                else{
+                    System.out.println("clear to write!");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
 
     }
     public static class Date{
@@ -196,6 +236,23 @@ public class FirstRestController {
         if(result.userHasLoggedIn){
             result.checkRoomAvailability(Date.setDate(startDay, startHours, startMinutes), Date.setDate(finalDay, finalHours,finalMinutes));
         }
+        return result;
+    }
+    @RequestMapping(path = "/checkRoom/{startDay}-{startHours}-{startMinutes}/{finalDay}-{finalHours}-{finalMinutes}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public static RestResponse checkRoom(
+            @PathVariable int startDay,@PathVariable int startHours, @PathVariable int startMinutes, @PathVariable int finalDay,@PathVariable int finalHours, @PathVariable int finalMinutes){
+        RestResponse result = null;
+        if(userInfo!=null){
+            result = userInfo;
+        }
+        else{
+            result = new RestResponse();
+        }
+
+
+        //if(result.userHasLoggedIn){
+            result.checkRoomHours(Date.setDate(startDay, startHours, startMinutes), Date.setDate(finalDay, finalHours,finalMinutes));
+        //}
         return result;
     }
     @RequestMapping(path = "/deleteUser/{email}/{password}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
